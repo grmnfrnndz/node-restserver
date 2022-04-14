@@ -176,9 +176,55 @@ const mostrarImagen = async (req=request, res=response) => {
     }
 }
 
+
+const mostrarImagenCloudinary = async (req=request, res=response) => {
+
+    const {coleccion, id} = req.params;
+
+    let modelo;
+
+    switch (coleccion) {
+        case 'usuarios':
+            modelo = await Usuario.findById(id);
+            if (!modelo) {
+
+                return res.status(400).json({
+                    msg: `No existe el usuario ${id}.`
+                });
+            }
+            break;
+        case 'productos':
+            modelo = await Producto.findById(id);
+            if (!modelo) {
+                return res.status(400).json({
+                    msg: `No existe el producto ${id}.`
+                });
+            }
+            break;
+        default:
+            return res.status(400).json({msg: 'Esta accion no esta permitida.'});
+    }
+
+    try {
+        // limpiar imagenes previas
+
+        let img = 'https://res.cloudinary.com/dwzeydb7o/image/upload/v1649907144/no-image_q3k4ma.jpg';
+
+        if (modelo.img) {
+            img = modelo.img;
+        }
+        
+        res.json({img});
+    } catch (msg) {
+        console.log(msg);
+        res.status(400).json({msg});
+    }
+}
+
 module.exports = {
     cargarArchivo,
     actualizarImg,
     mostrarImagen,
-    actualizarImgCloudinary
+    actualizarImgCloudinary,
+    mostrarImagenCloudinary
 }
